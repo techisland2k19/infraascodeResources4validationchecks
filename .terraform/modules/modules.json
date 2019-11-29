@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"cloud_storage","Source":"terraform-google-modules/cloud-storage/google","Version":"1.1.0","Dir":".terraform/modules/cloud_storage/terraform-google-modules-terraform-google-cloud-storage-c011106"}]}

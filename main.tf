@@ -26,7 +26,7 @@ resource "google_compute_network" "default" {
       region        = "${lookup(var.subnetworks[count.index], "region")}" # as region setting in subnetwork variable
       network       = "${google_compute_network.default.self_link}" # mandatory
 
-      enable_flow_logs          = "${lookup(var.subnetworks[count.index], "enable_flow_logs", "false")}"
+      #enable_flow_logs          = "${lookup(var.subnetworks[count.index], "enable_flow_logs", "false")}"
       #log_config {
    # aggregation_interval = "INTERVAL_10_MIN"
     #flow_sampling        = 0.5
@@ -65,9 +65,10 @@ resource "google_compute_instance" "vm_instance" {
 
   network_interface {
     # A default network is created for all GCP projects
-    #network       = "${google_compute_network.default.self_link}"
-    subnetwork = "${google_compute_subnetwork.default.*.name[0]}" 
-   access_config = {
+    network       = "${google_compute_network.default.self_link}"
+    subnetwork = "${google_compute_subnetwork.default.*.name[0]}"
+  subnetwork_project = "p-02-08-19-gcp-lab-admin4" 
+   access_config  {
     }
   }
 }
@@ -85,9 +86,41 @@ project = "${var.project}"
 
   network_interface {
     # A default network is created for all GCP projects
-    #network       = "${google_compute_network.default.self_link}"
+    network       = "${google_compute_network.default.self_link}"
   subnetwork = "${google_compute_subnetwork.default.*.name[0]}"   
- access_config = {
+  subnetwork_project = "p-02-08-19-gcp-lab-admin4" 
+access_config  {
     }
   }
+}
+
+
+resource "google_project_iam_binding" "iam_based_roles" {
+  project = "${var.project}"
+  role    = "roles/editor"
+
+  members = [
+    "user:zubair.munir17@gmail.com",
+    "user:learningtech2k19@gmail.com",
+  ]
+}
+
+module "cloud_storage" {
+  source               = "terraform-google-modules/cloud-storage/google"
+  project_id            = "p-02-08-19-gcp-lab-admin4"
+  names                = ["${var.project}-vli08"]
+  prefix               = "b01"
+  location             = "US"
+  bucket_policy_only   = {"${var.project}-vli08" = false }
+  force_destroy        = {"${var.project}-vli08" = true }
+}
+
+resource "google_storage_bucket_iam_binding" "binding" {
+  bucket = "${module.cloud_storage.name}"
+  role        = "roles/storage.objectViewer"
+
+  members = [
+    "allUsers",
+    "allAuthenticatedUsers",
+  ]
 }

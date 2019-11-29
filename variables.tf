@@ -196,3 +196,9 @@ variable "shared_vpc_host" {
 }
 
  *****************************************/
+
+variable "names" {
+  description = "Names of the buckets to create in module."
+  type        = list(string)
+  default = [""]
+}
